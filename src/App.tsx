@@ -7,6 +7,10 @@ import QuizPage from './pages/QuizPage';
 import DashboardPage from './pages/DashboardPage';
 import PDFUploadPage from './pages/PDFUploadPage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import CustomQuizPage from './pages/CustomQuizPage';
+import StatsPage from './pages/StatsPage';
+import ImportHelpPage from './pages/ImportHelpPage';
+import ComingSoonPage from './pages/ComingSoonPage';
 
 function App() {
   return (
@@ -20,6 +24,10 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/upload" element={<PDFUploadPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="/custom-quiz" element={<CustomQuizPage />} />
+            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/import-help" element={<ImportHelpPage />} />
+            <Route path="/youtube-notes" element={<ComingSoonPage />} />
           </Routes>
         </main>
         <Toaster position="bottom-right" />

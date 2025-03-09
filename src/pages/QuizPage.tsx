@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import QuizCard from '../components/QuizCard';
-import type { Question, UserAnswer, QuizAttempt } from '../types';
+import type { Question, UserAnswer, QuizAttempt, Quiz } from '../types';
 import { saveQuizAttempt } from '../utils/storage';
 import { v4 as uuidv4 } from 'uuid';
 
-const quizzes: Record<string, { title: string, questions: Question[] }> = {
+// Default quizzes
+const defaultQuizzes: Record<string, { title: string, questions: Question[] }> = {
   '1': {
     title: 'Algebra Basics Quiz',
     questions: [
@@ -251,69 +252,70 @@ const quizzes: Record<string, { title: string, questions: Question[] }> = {
         correctAnswer: 2,
         explanation: 'Canberra became the capital in 1913 to resolve rivalry between Sydney and Melbourne.'
       },
-{
-  id: '2',
-  text: "What is the world's largest desert?",
-  options: ['Sahara', 'Gobi', 'Mojave', 'Atacama'],
-  correctAnswer: 0,
-  explanation: "The Sahara Desert is the world's largest hot desert, covering an area of approximately 9.2 million square kilometers."
-},
-{
-  id: '3',
-  text: 'Which river is the longest in South America?',
-  options: ['Amazon River', 'Parana River', 'Sao Francisco River', 'Magdalena River'],
-  correctAnswer: 0,
-  explanation: 'The Amazon River is the longest river in South America, stretching for approximately 6,400 kilometers through Brazil, Colombia, and Peru.'
-},
-{
-  id: '4',
-  text: 'What is the capital city of Australia?',
-  options: ['Sydney', 'Melbourne', 'Canberra', 'Perth'],
-  correctAnswer: 2,
-  explanation: 'Canberra is the capital city of Australia, located in the Australian Capital Territory.'
-},
-{
-  id: '5',
-  text: 'Which mountain range runs along the border between France and Spain?',
-  options: ['Pyrenees', 'Alps', 'Carpathian Mountains', 'Apennine Mountains'],
-  correctAnswer: 0,
-  explanation: 'The Pyrenees mountain range runs along the border between France and Spain, stretching for approximately 435 kilometers.'
-},
-{
-  id: '6',
-  text: 'What is the largest island in the Mediterranean Sea?',
-  options: ['Sicily', 'Sardinia', 'Corsica', 'Crete'],
-  correctAnswer: 0,
-  explanation: 'Sicily is the largest island in the Mediterranean Sea, with an area of approximately 25,711 square kilometers.'
-},
-{
-  id: '7',
-  text: 'Which city is the largest in Scandinavia?',
-  options: ['Stockholm', 'Copenhagen', 'Oslo', 'Helsinki'],
-  correctAnswer: 0,
-  explanation: 'Stockholm is the largest city in Scandinavia, with a population of approximately 950,000 people.'
-},
-{
-  id: '8',
-  text: "What is the world's largest waterfall, by volume of water?",
-  options: ['Victoria Falls', 'Iguazu Falls', 'Niagara Falls', 'Angel Falls'],
-  correctAnswer: 0,
-  explanation: "Victoria Falls is the world's largest waterfall, by volume of water, located on the border of Zambia and Zimbabwe in southern Africa."
-},
-{
-  id: '9',
-  text: 'Which country is the largest in Southeast Asia?',
-  options: ['Indonesia', 'Malaysia', 'Thailand', 'Vietnam'],
-  correctAnswer: 0,
-  explanation: 'Indonesia is the largest country in Southeast Asia, with an area of approximately 1.9 million square kilometers.'
-},
-{
-  id: '10',
-  text: 'What is the highest mountain peak in North America?',
-  options: ['Denali', 'Mount Whitney', 'Mount Rainier', 'Mount Hood'],
-  correctAnswer: 0,
-  explanation: 'Denali, formerly known as Mount McKinley, is the highest mountain peak in North America, with an elevation of approximately 6,190 meters.'
-},    ]
+      {
+        id: '2',
+        text: "What is the world's largest desert?",
+        options: ['Sahara', 'Gobi', 'Mojave', 'Atacama'],
+        correctAnswer: 0,
+        explanation: "The Sahara Desert is the world's largest hot desert, covering an area of approximately 9.2 million square kilometers."
+      },
+      {
+        id: '3',
+        text: 'Which river is the longest in South America?',
+        options: ['Amazon River', 'Parana River', 'Sao Francisco River', 'Magdalena River'],
+        correctAnswer: 0,
+        explanation: 'The Amazon River is the longest river in South America, stretching for approximately 6,400 kilometers through Brazil, Colombia, and Peru.'
+      },
+      {
+        id: '4',
+        text: 'What is the capital city of Australia?',
+        options: ['Sydney', 'Melbourne', 'Canberra', 'Perth'],
+        correctAnswer: 2,
+        explanation: 'Canberra is the capital city of Australia, located in the Australian Capital Territory.'
+      },
+      {
+        id: '5',
+        text: 'Which mountain range runs along the border between France and Spain?',
+        options: ['Pyrenees', 'Alps', 'Carpathian Mountains', 'Apennine Mountains'],
+        correctAnswer: 0,
+        explanation: 'The Pyrenees mountain range runs along the border between France and Spain, stretching for approximately 435 kilometers.'
+      },
+      {
+        id: '6',
+        text: 'What is the largest island in the Mediterranean Sea?',
+        options: ['Sicily', 'Sardinia', 'Corsica', 'Crete'],
+        correctAnswer: 0,
+        explanation: 'Sicily is the largest island in the Mediterranean Sea, with an area of approximately 25,711 square kilometers.'
+      },
+      {
+        id: '7',
+        text: 'Which city is the largest in Scandinavia?',
+        options: ['Stockholm', 'Copenhagen', 'Oslo', 'Helsinki'],
+        correctAnswer: 0,
+        explanation: 'Stockholm is the largest city in Scandinavia, with a population of approximately 950,000 people.'
+      },
+      {
+        id: '8',
+        text: "What is the world's largest waterfall, by volume of water?",
+        options: ['Victoria Falls', 'Iguazu Falls', 'Niagara Falls', 'Angel Falls'],
+        correctAnswer: 0,
+        explanation: "Victoria Falls is the world's largest waterfall, by volume of water, located on the border of Zambia and Zimbabwe in southern Africa."
+      },
+      {
+        id: '9',
+        text: 'Which country is the largest in Southeast Asia?',
+        options: ['Indonesia', 'Malaysia', 'Thailand', 'Vietnam'],
+        correctAnswer: 0,
+        explanation: 'Indonesia is the largest country in Southeast Asia, with an area of approximately 1.9 million square kilometers.'
+      },
+      {
+        id: '10',
+        text: 'What is the highest mountain peak in North America?',
+        options: ['Denali', 'Mount Whitney', 'Mount Rainier', 'Mount Hood'],
+        correctAnswer: 0,
+        explanation: 'Denali, formerly known as Mount McKinley, is the highest mountain peak in North America, with an elevation of approximately 6,190 meters.'
+      },
+    ]
   },
   '5': {
     title: 'English Literature Quiz',
@@ -346,7 +348,7 @@ const quizzes: Record<string, { title: string, questions: Question[] }> = {
     questions: [
       {
         id: '1',
-        text: 'What is Newton’s first law?',
+        text: "What is Newton's first law?",
         options: [
           'F = ma',
           'Action-Reaction',
@@ -405,7 +407,6 @@ const quizzes: Record<string, { title: string, questions: Question[] }> = {
   }
 };
 
-
 export default function QuizPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -413,16 +414,70 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
   const [quizComplete, setQuizComplete] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
-
-  const quiz = id ? quizzes[id] : undefined;
-  const questions = quiz?.questions || [];
+  const [quiz, setQuiz] = useState<{ title: string, questions: Question[] } | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState(Date.now());
 
   useEffect(() => {
+    const loadQuiz = async () => {
+      if (!id) {
+        setError('Quiz ID not provided');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // First check if it's a default quiz
+        if (defaultQuizzes[id]) {
+          setQuiz(defaultQuizzes[id]);
+          setLoading(false);
+          return;
+        }
+
+        // Check localStorage for custom quizzes
+        const savedQuizzes = localStorage.getItem('quizzes');
+        const savedCustomQuizzes = localStorage.getItem('customQuizzes');
+        
+        let foundQuiz: Quiz | undefined;
+        
+        // Check in main quizzes
+        if (savedQuizzes) {
+          const parsedQuizzes = JSON.parse(savedQuizzes) as Quiz[];
+          foundQuiz = parsedQuizzes.find(q => q.id === id);
+        }
+        
+        // If not found, check in custom quizzes
+        if (!foundQuiz && savedCustomQuizzes) {
+          const parsedCustomQuizzes = JSON.parse(savedCustomQuizzes) as Quiz[];
+          foundQuiz = parsedCustomQuizzes.find(q => q.id === id);
+        }
+        
+        if (foundQuiz) {
+          setQuiz({
+            title: foundQuiz.title,
+            questions: foundQuiz.questions
+          });
+        } else {
+          setError('Quiz not found');
+        }
+      } catch (err) {
+        console.error('Error loading quiz:', err);
+        setError('Failed to load quiz');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadQuiz();
     setCurrentQuestionIndex(0);
     setAnswers([]);
     setQuizComplete(false);
     setShowSubmitConfirm(false);
+    setStartTime(Date.now());
   }, [id]);
+
+  const questions = quiz?.questions || [];
 
   const handleAnswer = (answer: UserAnswer) => {
     const existingAnswerIndex = answers.findIndex(a => a.questionId === answer.questionId);
@@ -448,23 +503,72 @@ export default function QuizPage() {
   };
 
   const handleSubmit = () => {
-    if (answers.length < questions.length) {
+    if (answers.length < questions.length && !showSubmitConfirm) {
       setShowSubmitConfirm(true);
-    } else {
-      setQuizComplete(true);
+      return;
     }
+
+    setQuizComplete(true);
+    
+    // Calculate score and other metrics
+    const correctAnswers = answers.filter(answer => answer.isCorrect).length;
+    const score = correctAnswers / questions.length;
+    const endTime = Date.now();
+    const timeSpent = Math.round((endTime - startTime) / 1000); // in seconds
+    
+    // Create quiz attempt record
+    const quizAttempt: QuizAttempt = {
+      id: uuidv4(),
+      quizId: id || '',
+      title: quiz?.title || 'Unknown Quiz',
+      date: new Date().toISOString(),
+      score: score,
+      timeSpent: timeSpent,
+      correctAnswers: correctAnswers,
+      totalQuestions: questions.length,
+      answers: answers
+    };
+    
+    // Save to localStorage
+    const savedAttempts = localStorage.getItem('quizAttempts') || '[]';
+    const attempts = JSON.parse(savedAttempts);
+    attempts.push(quizAttempt);
+    localStorage.setItem('quizAttempts', JSON.stringify(attempts));
   };
 
-  if (!questions.length) {
+  if (loading) {
     return (
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8 text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Quiz Not Found</h2>
-        <p className="text-gray-600 mb-6">Sorry, we couldn't find the quiz you're looking for.</p>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
+        <p className="text-gray-700 mb-6">{error}</p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          Return Home
+          Return to Home
+        </button>
+      </div>
+    );
+  }
+
+  if (!quiz) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Quiz Not Found</h2>
+        <p className="text-gray-700 mb-6">The quiz you're looking for doesn't exist.</p>
+        <button
+          onClick={() => navigate('/')}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Return to Home
         </button>
       </div>
     );

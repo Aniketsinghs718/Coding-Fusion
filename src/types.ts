@@ -11,6 +11,9 @@ export interface Quiz {
   title: string;
   questions: Question[];
   timeLimit?: number;
+  image?: string;
+  questionCount?: number;
+  time?: string;
 }
 
 export interface UserAnswer {
